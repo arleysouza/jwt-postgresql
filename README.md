@@ -147,26 +147,56 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 ```
-### Modificações realizadas no projeto
-
-1. Foi necessário instalar os pacotes 'react-router' e 'react-router-dom' para podermos gerenciar rotas no aplicativo. Vale lembrar que criaremos rotas para componentes;
-2. `/src/index.css`: foram adicionados os estilos para remover a formatação padrão de hiperlinks e hiperlinks visitados:
+- A tabela `spents` possui os campos `value` e `idproduct` com restrições.
 ```
-/* Remove a formatação padrão de hiperlinks */
-a {
-  text-decoration: none; /* Remove sublinhado */
-  color: inherit; /* Mantém a cor padrão do texto */
-}
-/* Remove a formatação de hiperlinks visitados */
-a:visited {
-  color: inherit; /* Mantém a cor padrão do texto */
-}
+CREATE FUNCTION spents_insert_validate() RETURNS trigger AS $$
+BEGIN
+    -- Verifica se foi fornecido o valor
+    IF new.value is null THEN
+        RAISE EXCEPTION 'O valor é obrigatório';
+    ELSE
+        -- Verifica se foi fornecido o ID do produto
+        IF new.idproduct is null THEN
+            RAISE EXCEPTION 'O produto é obrigatório';
+        ELSE
+            -- Verifica se o idproduct existe na tabela products
+            IF NOT EXISTS (SELECT 1 FROM products WHERE id = NEW.idproduct) THEN
+                RAISE EXCEPTION 'O produto fornecido não existe no cadastro';
+            END IF;
+        END IF;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
 ```
-3. Criou-se o componente `Logo` na pasta `components`. Esse componente possui a imagem do logo bem como a formatação CSS que foi aplicada usando styled-components. O componente `Logo` será criado na barra de menu;
-4. Criou-se o componente `ItemMenu` na pasta `components`. Cada componente será um hiperlink para uma rota. Os componentes `ItemMenu` serão criados na barra de menu;
-5. Criou-se a pasta `routes` nela você vai definir as rotas;
 
-### Modificações necessárias no projeto
-1. Será necessário criar as rotas `/rgb`,`/hsla` e `/cmyk`, no pacote `routes`, usando a estrutura de marcações `<BrowserRouter>`,`<Routes>` e `<Route>`;
-2. A localização do provider - por exemplo, `<RGBProvider>` - determina o seu alcance. Para manter os valores dos campos de entrada quando o usuário navegar de uma rota para outra será necessário colocar `<RGBProvider>` numa posição que envolva as rotas;
-3. Será necessário chamar o componente `<Rotas>` no componente `App`. Visto que toda a interface da aplicação estará no componente `Rotas`.
+### Carregar dados de teste
+No arquivo `src/database/load.ts` estão as instruções SQL para carregar registros nas tabelas.
+
+Execute o comando `npm run load` para submeter as instruções SQL no SGBD.
+
+### Restrição de acesso
+A aplicação possui os níveis de acesso para os perfis `adm` e `user`. 
+
+Rotas sem restrição de acesso:
+- HTTP POST `/login`: efetuar login;
+- HTTP POST `/usuario`: o usuário efetua o seu próprio cadastro.
+Rotas para usuário logados:
+- HTTP GET `/categoria`: listar as categorias;
+- HTTP GET `/produto`: listar os produtos;
+- HTTP GET `/gasto`: usuário lista somente os seus gastos;
+- HTTP POST `/gasto`: usuário cria um gasto;
+- HTTP PUT `/gasto`: usuário altera um gasto dele;
+- HTTP DELETE `/gasto`: usuário exclui um gasto dele;
+- HTTP DELETE `/usuario`: usuário exclui o próprio cadastro;
+- HTTP PUT `/usuario/mail`: usuário altera o próprio e-mail;
+- HTTP PUT `/usuario/senha`: usuário altera a própria senha.
+Rotas para usuário logados com o perfil `adm`:
+- HTTP POST `/categoria`: cria uma categoria;
+- HTTP PUT `/categoria`: altera uma categoria;
+- HTTP DELETE `/categoria`: exclui uma categoria;
+- HTTP POST `/produto`: cria um produto;
+- HTTP PUT `/produto`: altera um produto;
+- HTTP DELETE `/produto`: exclui um produto;
+- HTTP GET `/usuario`: listar os usuários;
+- HTTP PUT `/usuario/perfil`: altera o perfil de algum usuário.
