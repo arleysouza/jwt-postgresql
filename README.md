@@ -56,8 +56,97 @@ BEFORE INSERT ON users
 - Trigger de `before insert` na tabela `spents`: definido usando a função  `spents_insert_validate`;
 - Trigger de `before update` na tabela `spents`: definido usando a função  `spents_update_validate`.
 
-#### Validações dos campos
+#### Restrições dos campos
+As restrições dos campos estão sendo validadas nas funções e serão lançadas exceções no caso de inconformidades.
 
+- A tabela `categories` possui apenas o campo `name` com restrições. Será lançada uma exceção caso não seja satisfeita a condição:
+```
+CREATE FUNCTION categories_insert_validate() RETURNS trigger AS $$
+BEGIN
+    -- Converte para minúsculo e remove os espaços no início e fim
+    new.name := lower(trim(new.name));
+    -- Verifica se o nome já existe
+    IF EXISTS (SELECT 1 FROM categories WHERE new.name = name) THEN
+        RAISE EXCEPTION 'O nome % já está em uso', new.name;
+    ELSE
+        -- Verifica se o nome possui algum caractere
+        IF length(new.name) = 0 THEN
+            RAISE EXCEPTION 'O nome precisa ter pelo menos uma letra';
+        END IF;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+```
+- A tabela `products` possui os campos `name` e `idcategory` com restrições.
+```
+CREATE FUNCTION products_insert_validate() RETURNS trigger AS $$
+BEGIN
+    -- Verifica se foi fornecido o nome
+    IF new.name is null THEN
+        RAISE EXCEPTION 'O nome é obrigatório';
+    ELSE
+        -- Converte para minúsculo e remove os espaços no início e fim
+        new.name := lower(trim(new.name));
+        -- Verifica se o nome já existe
+        IF EXISTS (SELECT 1 FROM products WHERE new.name = name) THEN
+            RAISE EXCEPTION 'O nome % já está em uso', new.name;
+        ELSE
+            -- Verifica se o nome possui algum caractere
+            IF length(new.name) = 0 THEN
+                RAISE EXCEPTION 'O nome precisa ter pelo menos uma letra';
+            ELSE
+                -- Verifica se foi fornecido o idcategory
+                IF new.idcategory is NULL THEN
+                    RAISE EXCEPTION 'A categoria é obrigatória';
+                ELSE
+                    -- Verifica se o idcategory fornecido existe na tabela categories
+                    IF NOT EXISTS (SELECT 1 FROM categories WHERE id = NEW.idcategory) THEN
+                        RAISE EXCEPTION 'A categoria fornecida não existe no cadastro';
+                    END IF;
+                END IF;
+            END IF;
+        END IF;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+```
+- A tabela `users` possui os campos `mail` e `password` com restrições.
+```
+CREATE FUNCTION users_insert_validade() RETURNS trigger AS $$
+BEGIN
+    -- Converte para minúsculo e remove os espaços no início e fim
+    new.mail := lower(trim(new.mail));
+    new.password := trim(new.password);
+    -- Verifica se foi fornecido o mail
+    IF new.mail is null THEN
+        RAISE EXCEPTION 'O e-mail é obrigatório';
+    ELSE
+        -- Verifica se foi fornecida a senha
+        IF new.password is null THEN
+            RAISE EXCEPTION 'A senha é obrigatória';
+        ELSE
+            -- Valida o formato do e-mail usando expressão regular
+            IF NOT new.mail ~* '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$' THEN
+                RAISE EXCEPTION 'O e-mail % não está em um formato válido', new.mail;
+            ELSE
+                -- Verifica se o mail já existe
+                IF EXISTS (SELECT 1 FROM users WHERE new.mail = mail) THEN
+                    RAISE EXCEPTION 'O e-mail % já está em uso', new.mail;
+                ELSE
+                    -- Verifica se a senha tem a quantidade correta de caracteres
+                    IF length(new.password) < 6 OR length(new.password) > 10 THEN
+                        RAISE EXCEPTION 'A senha deve ter entre 6 e 10 caracterese';
+                    END IF;
+                END IF;
+            END IF;
+        END IF;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+```
 ### Modificações realizadas no projeto
 
 1. Foi necessário instalar os pacotes 'react-router' e 'react-router-dom' para podermos gerenciar rotas no aplicativo. Vale lembrar que criaremos rotas para componentes;
