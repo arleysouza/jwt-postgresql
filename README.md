@@ -181,6 +181,7 @@ A aplicação possui os níveis de acesso para os perfis `adm` e `user`.
 Rotas sem restrição de acesso:
 - HTTP POST `/login`: efetuar login;
 - HTTP POST `/usuario`: o usuário efetua o seu próprio cadastro.
+
 Rotas para usuário logados:
 - HTTP GET `/categoria`: listar as categorias;
 - HTTP GET `/produto`: listar os produtos;
@@ -191,6 +192,7 @@ Rotas para usuário logados:
 - HTTP DELETE `/usuario`: usuário exclui o próprio cadastro;
 - HTTP PUT `/usuario/mail`: usuário altera o próprio e-mail;
 - HTTP PUT `/usuario/senha`: usuário altera a própria senha.
+
 Rotas para usuário logados com o perfil `adm`:
 - HTTP POST `/categoria`: cria uma categoria;
 - HTTP PUT `/categoria`: altera uma categoria;
