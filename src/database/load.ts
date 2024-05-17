@@ -1,4 +1,4 @@
-import query from "./db";
+import query from "../database/connection";
 
 async function load() {
   return query(`

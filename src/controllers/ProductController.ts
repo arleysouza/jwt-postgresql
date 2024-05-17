@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import query from "./db";
+import query from "../database/connection";
 
 class ProductController {
   public async create(req: Request, res: Response): Promise<void> {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import query from "./db";
+import query from "../database/connection";
 import { tokenize } from "../middlewares";
 
 class UserController {

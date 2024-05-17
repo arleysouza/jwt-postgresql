@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "init": "ts-node ./src/controllers/init",
-    "load": "ts-node ./src/controllers/load",
+    "create": "ts-node ./src/database/create",
+    "load": "ts-node ./src/database/load",
     "start": "ts-node ./src",
     "dev": "ts-node-dev ./src"
   },
