@@ -6,13 +6,13 @@ Esse aplicativo é usado para estabelecer uma conexão com o SGBD PostgreSQL par
 
 
 ### Instruções de uso
-Todos os pacotes necessários já estão no `package.json`.
+Todos os pacotes necessários estão no `package.json`.
 ```
 git clone https://github.com/arleysouza/jwt-postgresql.git server
 cd server
 npm i
 ```
-Você precisa colocar nas variáveis de ambiente do arquivo `.env` os parâmetros de conexão do SBGD PostgreSQL. Lembre-se que você precisa criar o BD no SGBD.
+Você precisa substituir as variáveis de ambiente do arquivo `.env` pelos parâmetros de conexão do SBGD PostgreSQL que você criou.
 ```
 PORT = 3010
 JWT_SECRET = @tokenJWT
@@ -24,7 +24,7 @@ DB_PASSWORD = 123
 DB_PORT = 5432
 DB_URI = postgres://root:@dpg-coufst21hbls7385tsd0-a.oregon-postgres.render.com/bdatividade
 ```
-Se optar pelo SGBD na nuvem, você precisará sustituir a variável `DB_URI` e também retirar o comentário do arquivo `src/dabase/connection.ts` para configurar o pool de conexão
+Se optar pelo SGBD na nuvem, você precisará sustituir a variável `DB_URI` e também retirar o comentário do código a seguir no arquivo `src/database/connection.ts`, para configurar o pool de conexão.
 ```
 const pool = new Pool({
   connectionString: process.env.DB_URI,
@@ -33,6 +33,24 @@ const pool = new Pool({
   }
 });
 ```
+
+### SQL para criar as tabelas
+No arquivo `src/database/create.ts` estão as instruções SQL para criar as tabelas e definir os triggers com validações ao fazer insert e update nas tabelas.
+Execute o comando `npm run create` para submeter as instruções SQL no SGBD.
+Para fazer as validações nos campos das tabelas foram definidos os seguintes triggers. Cada trigger foi definido usando uma função:
+- Trigger de `before insert` na tabela `users`: o comando a seguir faz a vinculação da função `users_insert_validade` ao trigger de insert na tabela `users`:
+```
+CREATE TRIGGER users_insert_trigger
+BEFORE INSERT ON users
+ FOR EACH ROW EXECUTE PROCEDURE users_insert_validade();
+```
+- Trigger de `before update` na tabela `users`: definido usando a função  `users_update_validade`;
+- Trigger de `before insert` na tabela `products`: definido usando a função  `products_insert_validate`;
+- Trigger de `before update` na tabela `products`: definido usando a função  `products_update_validate`;
+- Trigger de `before insert` na tabela `categories`: definido usando a função  `categories_insert_validate`;
+- Trigger de `before update` na tabela `categories`: definido usando a função  `categories_update_validate`;
+- Trigger de `before insert` na tabela `spents`: definido usando a função  `spents_insert_validate`;
+- Trigger de `before update` na tabela `spents`: definido usando a função  `spents_update_validate`.
 
 ### Modificações realizadas no projeto
 
