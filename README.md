@@ -35,10 +35,14 @@ const pool = new Pool({
 ```
 
 ### SQL para criar as tabelas
-No arquivo `src/database/create.ts` estão as instruções SQL para criar as tabelas e definir os triggers com validações ao fazer insert e update nas tabelas.
+No arquivo `src/database/create.ts` estão as instruções SQL para criar as tabelas e definir os triggers com as validações ao fazer insert e update nas tabelas.
+
 Execute o comando `npm run create` para submeter as instruções SQL no SGBD.
-Para fazer as validações nos campos das tabelas foram definidos os seguintes triggers. Cada trigger foi definido usando uma função:
-- Trigger de `before insert` na tabela `users`: o comando a seguir faz a vinculação da função `users_insert_validade` ao trigger de insert na tabela `users`:
+
+#### Triggers
+
+Para fazer as validações nos campos das tabelas foram definidos os seguintes triggers, onde cada trigger foi definido usando uma função:
+- Trigger de `before insert` na tabela `users`: o comando a seguir faz a vinculação da função `users_insert_validade` ao trigger na tabela `users`:
 ```
 CREATE TRIGGER users_insert_trigger
 BEFORE INSERT ON users
@@ -51,6 +55,8 @@ BEFORE INSERT ON users
 - Trigger de `before update` na tabela `categories`: definido usando a função  `categories_update_validate`;
 - Trigger de `before insert` na tabela `spents`: definido usando a função  `spents_insert_validate`;
 - Trigger de `before update` na tabela `spents`: definido usando a função  `spents_update_validate`.
+
+#### Validações dos campos
 
 ### Modificações realizadas no projeto
 
