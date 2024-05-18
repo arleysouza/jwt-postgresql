@@ -15,7 +15,7 @@ class SpentController {
   public async list(req: Request, res: Response): Promise<void> {
     const { id:iduser } = res.locals;
     const r:any = await query(
-      `SELECT a.id, b.name, a.value, a.datetime
+      `SELECT a.id, b.name, a.value::FLOAT, a.datetime
        FROM spents AS a LEFT JOIN products AS b
        ON a.idproduct = b.id
        WHERE iduser = $1
