@@ -1,6 +1,6 @@
 ## Atividade - JWT (JSON Web Token)
 
-Esse aplicativo é usado para estabelecer uma conexão com o SGBD PostgreSQL para persistir dados nas seguintes tabelas. 
+O aplicativo possui as operações para fazer o CRUD nas tabelas representadas no modelo a seguir. Essas operações estão disponíveis através de rotas que possuem controle de acesso para usuários logados com o perfil adm, perfil user e sem a necessidade de estar logado. Ao efetuar o login, os dados do usuário são empacotados em um token e retornados para o cliente, que por sua vez, terá de enviar esse token em todas as requisições que requerem o controle de acesso. O token é gerado usando o pacote JWT (JSON Web Token). O código disponível no pacote middlewares é  chamado antes da função objetivo da rota para decodificar o token e validar o perfil de acesso do usuário. Se o usuário não tiver permissão, a função middleware impede o acesso ao recurso mapeado pela rota. 
 
 ![](https://github.com/arleysouza/jwt-postgresql/blob/main/images/modelDB.png)
 
