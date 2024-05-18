@@ -175,7 +175,7 @@ No arquivo `src/database/load.ts` estão as instruções SQL para carregar regis
 
 Execute o comando `npm run load` para submeter as instruções SQL no SGBD.
 
-### Restrição de acesso
+### Restrições de acesso
 A aplicação possui os níveis de acesso para os perfis `adm` e `user`. 
 
 Rotas sem restrição de acesso:
