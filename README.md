@@ -24,7 +24,7 @@ DB_PASSWORD = 123
 DB_PORT = 5432
 DB_URI = postgres://root:@dpg-coufst21hbls7385tsd0-a.oregon-postgres.render.com/bdatividade
 ```
-Se optar pelo SGBD na nuvem, você precisará sustituir a variável `DB_URI` e também retirar o comentário do código a seguir no arquivo `src/database/connection.ts`, para configurar o pool de conexão.
+Se optar pelo SGBD na nuvem, você precisará sustituir a variável `DB_URI` e também retirar o comentário do código a seguir no arquivo `src/database/connection.ts`, para configurar o pool de conexões.
 ```
 const pool = new Pool({
   connectionString: process.env.DB_URI,
