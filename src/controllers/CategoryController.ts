@@ -24,7 +24,12 @@ class CategoryController {
       "DELETE FROM categories WHERE id = $1 RETURNING id, name", 
       [id]
     );
-    res.json(r);
+    if( r.rowcount > 0 ){
+      res.json(r.rows);
+    }
+    else{
+      res.json({ message: "Registro inexistente" });
+    }
   }
 
   public async update(req: Request, res: Response): Promise<void> {
@@ -33,7 +38,12 @@ class CategoryController {
       "UPDATE categories SET name=$2 WHERE id=$1 RETURNING id, name", 
       [id,name]
     );
-    res.json(r);
+    if( r.rowcount > 0 ){
+      res.json(r.rows);
+    }
+    else{
+      res.json({ message: "Registro inexistente" });
+    }
   }
 }
 

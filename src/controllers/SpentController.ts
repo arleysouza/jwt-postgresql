@@ -28,6 +28,7 @@ class SpentController {
   public async delete(req: Request, res: Response): Promise<void> {
     const { id } = req.body; 
     const { id:iduser } = res.locals;
+    console.log("aqui" );
     const r:any = await query(
       "DELETE FROM spents WHERE id = $1 AND iduser=$2 RETURNING id,idproduct,value", 
       [id, iduser]

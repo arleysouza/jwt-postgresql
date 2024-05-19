@@ -10,6 +10,6 @@ routes.delete("/", checkAdm, controller.delete);
 routes.put("/", checkAdm, controller.update);
 
 //aceita qualquer método HTTP ou URL
-routes.use( (_:Request,res:Response) => res.json({error:"Operação desconhecida com o produto"}) );
+routes.use( (_:Request,res:Response) => res.json({error:"Operação desconhecida com a categoria"}) );
 
 export default routes;
