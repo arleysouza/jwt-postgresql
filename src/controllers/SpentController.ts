@@ -6,7 +6,7 @@ class SpentController {
     const { idproduct, value } = req.body;
     const { id:iduser } = res.locals;
     const r:any = await query(
-      "INSERT INTO spents(iduser,idproduct,value) VALUES ($1,$2,$3) RETURNING id,datetime,value",
+      "INSERT INTO spents(iduser,idproduct,value) VALUES ($1,$2,$3) RETURNING id,idproduct as product,datetime,value",
       [iduser, idproduct, value]
     );
     res.json(r);
@@ -28,22 +28,36 @@ class SpentController {
   public async delete(req: Request, res: Response): Promise<void> {
     const { id } = req.body; 
     const { id:iduser } = res.locals;
-    console.log("aqui" );
+
     const r:any = await query(
-      "DELETE FROM spents WHERE id = $1 AND iduser=$2 RETURNING id,idproduct,value", 
+      "DELETE FROM spents WHERE id = $1 AND iduser=$2 RETURNING id,idproduct as product,value,datetime", 
       [id, iduser]
     );
-    res.json(r);
+    if( r.rowcount > 0 ){
+      res.json(r.rows);
+    }
+    else{
+      res.json({ message: "Registro inexistente" });
+    }
   }
 
   public async update(req: Request, res: Response): Promise<void> {
-    const { id, idproduct, value } = req.body;
+    const { id, product, value } = req.body;
     const { id:iduser } = res.locals;
     const r:any = await query(
-      "UPDATE spents SET idproduct=$3, value=$4 WHERE id=$1 AND iduser=$2 RETURNING id,idproduct,value", 
-      [id,iduser,idproduct,value]
+      "UPDATE spents SET idproduct=$3, value=$4 WHERE id=$1 AND iduser=$2 RETURNING id,idproduct as product,value,datetime", 
+      [id,iduser,product,value]
     );
-    res.json(r);
+
+    if( r.rowcount > 0 ){
+      res.json(r.rows);
+    }
+    else if ( r.rowcount === 0 ){
+      res.json({ message: "Registro inexistente" });
+    }
+    else{
+      res.json({ message: r.message });
+    }
   }
 }
 

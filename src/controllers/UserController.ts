@@ -20,7 +20,7 @@ class UserController {
         const [object] = response;
         res.json({ ...object, token: tokenize(object) });
       } else {
-        res.status(401).json({ erro: "Dados de login não conferem" });
+        res.json({ erro: "Dados de login não conferem" });
       }
     }
   }
@@ -41,7 +41,7 @@ class UserController {
       };
       res.json({ ...object, token: tokenize(object) });
     } else {
-      res.status(401).json({ erro: response.message });
+      res.json({ erro: response.message });
     }
   }
 
@@ -62,7 +62,7 @@ class UserController {
     if (response && response.rowcount && response.rowcount > 0) {
       res.json(response.rows);
     } else {
-      res.status(401).json({ erro: `Usuário não localizado` });
+      res.json({ erro: `Usuário não localizado` });
     }
   }
 
@@ -93,7 +93,7 @@ class UserController {
         [id,profile]);
       res.json(r);
     } else {
-      res.status(401).json({ erro: `Perfil inexistente` });
+      res.json({ erro: `Perfil inexistente` });
     }
   }
 }
