@@ -15,7 +15,7 @@ export const validadeAcess = (
   // o token enviado pelo cliente no header da requisição
   const authorization: string | undefined = req.headers.authorization;
   if (!authorization) {
-    res.status(401).send({ error: "Efetue o login para continuar" });
+    res.send({ error: "Efetue o login para continuar" });
   } else {
     try {
       // autorização no formato Bearer token
@@ -25,14 +25,14 @@ export const validadeAcess = (
         res.locals = decoded;
         next();
       } else {
-        res.status(401).send({ error: "Não autorizado" });
+        res.send({ message: "Não autorizado" });
       }
     } catch (e: any) {
       if( e.message == "jwt malformed" ){
-        res.status(401).send({ error: "Token inválido" });
+        res.send({ message: "Token inválido" });
       }
       else{
-        res.status(401).send({ error: e.message });
+        res.send({ message: e.message });
       }
     }
   }
@@ -43,6 +43,6 @@ export const checkAdm = (_: Request, res: Response, next: NextFunction) => {
   if (profile == "adm") {
     next();
   } else {
-    res.status(401).send({ error: "Acesso negado" });
+    res.send({ message: "Acesso negado" });
   }
 };

@@ -20,7 +20,7 @@ class UserController {
         const [object] = response;
         res.json({ ...object, token: tokenize(object) });
       } else {
-        res.json({ erro: "Dados de login não conferem" });
+        res.json({ message: "Dados de login não conferem" });
       }
     }
   }
@@ -41,18 +41,18 @@ class UserController {
       };
       res.json({ ...object, token: tokenize(object) });
     } else {
-      res.json({ erro: response.message });
+      res.json({ message: response.message });
     }
   }
 
   public async list(_: Request, res: Response): Promise<void> {
     const response: any = await query(
-      "SELECT id,mail,profile FROM users ORDER BY mail"
+      "SELECT id::varchar,mail,profile FROM users ORDER BY mail"
     );
     res.json(response);
   }
 
-  public async delete(req: Request, res: Response): Promise<void> {
+  public async delete(_: Request, res: Response): Promise<void> {
     const { id } = res.locals;
     const response: any = await query(
       "DELETE FROM users WHERE id = $1 RETURNING id, mail, profile",
@@ -62,16 +62,17 @@ class UserController {
     if (response && response.rowcount && response.rowcount > 0) {
       res.json(response.rows);
     } else {
-      res.json({ erro: `Usuário não localizado` });
+      res.json({ message: `Usuário não localizado` });
     }
   }
 
   public async updateMail(req: Request, res: Response): Promise<void> {
     const { mail } = req.body;
     const { id } = res.locals;
-    const r: any = await query(
-      "UPDATE users SET mail=$2 WHERE id=$1", 
-      [id, mail]);
+    const r: any = await query("UPDATE users SET mail=$2 WHERE id=$1", [
+      id,
+      mail,
+    ]);
     res.json(r);
   }
 
@@ -89,11 +90,18 @@ class UserController {
     const { id, profile } = req.body;
     if (profile === "adm" || profile === "user") {
       const r: any = await query(
-        "UPDATE users SET profile=$2 WHERE id=$1", 
-        [id,profile]);
-      res.json(r);
+        "UPDATE users SET profile=$2 WHERE id=$1 RETURNING id, mail, profile",
+        [id, profile]
+      );
+      if (r.rowcount > 0) {
+        res.json(r.rows);
+      } else if (r.rowcount == 0) {
+        res.json({ message: "Registro inexistente" });
+      } else {
+        res.json(r);
+      }
     } else {
-      res.json({ erro: `Perfil inexistente` });
+      res.json({ message: `Perfil inexistente` });
     }
   }
 }

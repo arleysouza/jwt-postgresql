@@ -6,7 +6,7 @@ const routes = Router();
 
 routes.get("/", controller.list);
 routes.post("/", checkAdm, controller.create);
-routes.delete("/", checkAdm, controller.delete);
+routes.delete("/:id", checkAdm, controller.delete);
 routes.put("/", checkAdm, controller.update);
 
 //aceita qualquer método HTTP ou URL

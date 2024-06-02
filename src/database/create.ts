@@ -10,12 +10,13 @@ async function init() {
         DROP TRIGGER IF EXISTS products_update_trigger ON products;
         DROP TRIGGER IF EXISTS categories_insert_trigger ON categories;
         DROP TRIGGER IF EXISTS categories_update_trigger ON categories;
+        DROP TRIGGER IF EXISTS categories_delete_trigger ON categories;
         DROP TRIGGER IF EXISTS spents_insert_trigger ON spents;
         DROP TRIGGER IF EXISTS spents_update_trigger ON spents;
 
         DROP FUNCTION IF EXISTS users_insert_validade, users_update_validade, 
                                 products_insert_validate, products_update_validate,
-                                categories_insert_validate, categories_update_validate,
+                                categories_insert_validate, categories_update_validate, categories_delete_validate,
                                 spents_insert_validate, spents_update_validate;
         
         DROP TABLE IF EXISTS spents, products, users, categories;
@@ -49,7 +50,7 @@ async function init() {
             CONSTRAINT products_idcategory_fk
                 FOREIGN KEY (idcategory)
                 references categories (id)
-                ON DELETE cascade
+                ON DELETE restrict
                 on UPDATE cascade
         );
 
@@ -68,12 +69,13 @@ async function init() {
             CONSTRAINT spents_idproduct_fk
             FOREIGN KEY(idproduct)
                 references products (id)
-                ON DELETE cascade
+                ON DELETE restrict
                 ON UPDATE cascade
         );
 
         -- Função para verificar mail repetido, mail inválido e senha na tabela users ao inserir
-        CREATE FUNCTION users_insert_validade() RETURNS trigger AS $$
+        CREATE FUNCTION users_insert_validade() 
+        RETURNS trigger AS $$
         BEGIN
             -- Converte para minúsculo e remove os espaços no início e fim
             new.mail := lower(trim(new.mail));
@@ -104,7 +106,8 @@ async function init() {
         $$ LANGUAGE plpgsql;
 
         -- Função para verificar mail repetido, mail inválido e senha na tabela users ao atualizar
-        CREATE FUNCTION users_update_validade() RETURNS trigger AS $$
+        CREATE FUNCTION users_update_validade() 
+        RETURNS trigger AS $$
         BEGIN
             -- Converte para minúsculo e remove os espaços no início e fim
             new.mail := lower(trim(new.mail));
@@ -135,7 +138,8 @@ async function init() {
         $$ LANGUAGE plpgsql;
 
         -- Função para verificar name repetido na tabela products ao inserir
-        CREATE FUNCTION products_insert_validate() RETURNS trigger AS $$
+        CREATE FUNCTION products_insert_validate() 
+        RETURNS trigger AS $$
         BEGIN
             IF new.name is null THEN
                 RAISE EXCEPTION 'O nome é obrigatório';
@@ -165,7 +169,8 @@ async function init() {
         $$ LANGUAGE plpgsql;
 
         -- Função para verificar name repetido na tabela products ao atualizar
-        CREATE FUNCTION products_update_validate() RETURNS trigger AS $$
+        CREATE FUNCTION products_update_validate() 
+        RETURNS trigger AS $$
         BEGIN
             IF new.name is null THEN
                 RAISE EXCEPTION 'O nome é obrigatório';
@@ -191,7 +196,8 @@ async function init() {
         $$ LANGUAGE plpgsql;
 
         -- Função para verificar name repetido na tabela categories ao inserir
-        CREATE FUNCTION categories_insert_validate() RETURNS trigger AS $$
+        CREATE FUNCTION categories_insert_validate() 
+        RETURNS trigger AS $$
         BEGIN
             -- Converte para minúsculo e remove os espaços no início e fim
             new.name := lower(trim(new.name));
@@ -208,7 +214,8 @@ async function init() {
         $$ LANGUAGE plpgsql;
 
         -- Função para verificar name repetido na tabela categories ao inserir
-        CREATE FUNCTION categories_update_validate() RETURNS trigger AS $$
+        CREATE FUNCTION categories_update_validate() 
+        RETURNS trigger AS $$
         BEGIN
             -- Converte para minúsculo e remove os espaços no início e fim
             new.name := lower(trim(new.name));
@@ -224,7 +231,21 @@ async function init() {
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE FUNCTION spents_insert_validate() RETURNS trigger AS $$
+
+        -- Função para verificar name repetido na tabela categories ao inserir
+        CREATE FUNCTION categories_delete_validate() 
+        RETURNS trigger AS $$
+        BEGIN
+            -- Verifica se existem produtos associados à categoria que está sendo excluída
+            IF EXISTS (SELECT 1 FROM products WHERE idcategory = OLD.id) THEN
+                RAISE EXCEPTION 'A categoria não pode ser excluída por existirem produtos';
+            END IF;
+            RETURN OLD;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE FUNCTION spents_insert_validate() 
+        RETURNS trigger AS $$
         BEGIN
             IF new.value is null THEN
                 RAISE EXCEPTION 'O valor é obrigatório';
@@ -242,7 +263,8 @@ async function init() {
         END;
         $$ LANGUAGE plpgsql;
 		
-        CREATE FUNCTION spents_update_validate() RETURNS trigger AS $$
+        CREATE FUNCTION spents_update_validate() 
+        RETURNS trigger AS $$
         BEGIN
             IF new.value is null THEN
                 RAISE EXCEPTION 'O valor é obrigatório';
@@ -275,7 +297,7 @@ async function init() {
         BEFORE INSERT ON products
         FOR EACH ROW EXECUTE PROCEDURE products_insert_validate();
 
-        -- Associa a função products_validate ao trigger de insert na tabela produtcs
+        -- Associa a função products_validate ao trigger de update na tabela produtcs
         CREATE TRIGGER products_update_trigger
         BEFORE UPDATE ON products
         FOR EACH ROW EXECUTE PROCEDURE products_update_validate();
@@ -285,17 +307,20 @@ async function init() {
         BEFORE INSERT ON categories
         FOR EACH ROW EXECUTE PROCEDURE categories_insert_validate();
 
-        -- Associa a função categories_update_validate ao trigger de insert na tabela categories
+        -- Associa a função categories_update_validate ao trigger de update na tabela categories
         CREATE TRIGGER categories_update_trigger
         BEFORE UPDATE ON categories
         FOR EACH ROW EXECUTE PROCEDURE categories_update_validate();
 
-        -- Associa a função ao trigger
+        -- Associa a função categories_delete_validate ao trigger de delete na tabela categories
+        CREATE TRIGGER categories_delete_trigger
+        BEFORE DELETE ON categories
+        FOR EACH ROW EXECUTE PROCEDURE categories_delete_validate();
+
         CREATE TRIGGER spents_insert_trigger
         BEFORE INSERT ON spents
         FOR EACH ROW EXECUTE PROCEDURE spents_insert_validate();
 
-        -- Associa a função ao trigger
         CREATE TRIGGER spents_update_trigger
         BEFORE UPDATE ON spents
         FOR EACH ROW EXECUTE PROCEDURE spents_update_validate();
