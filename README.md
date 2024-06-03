@@ -35,7 +35,7 @@ const pool = new Pool({
 ```
 
 ### SQL para criar as tabelas
-No arquivo `src/database/create.ts` estão as instruções SQL para criar as tabelas e definir os triggers com as validações ao fazer insert e update nas tabelas.
+No arquivo `src/database/create.ts` estão as instruções SQL para criar as tabelas e definir os triggers com as validações ao fazer insert, update e delete nas tabelas.
 
 Execute o comando `npm run create` para submeter as instruções SQL no SGBD.
 
@@ -46,15 +46,17 @@ Para fazer as validações nos campos das tabelas foram definidos os seguintes t
 ```
 CREATE TRIGGER users_insert_trigger
 BEFORE INSERT ON users
- FOR EACH ROW EXECUTE PROCEDURE users_insert_validade();
+FOR EACH ROW EXECUTE PROCEDURE users_insert_validade();
 ```
 - Trigger de `before update` na tabela `users`: definido usando a função  `users_update_validade`;
 - Trigger de `before insert` na tabela `products`: definido usando a função  `products_insert_validate`;
 - Trigger de `before update` na tabela `products`: definido usando a função  `products_update_validate`;
+- Trigger de `before delete` na tabela `products`: definido usando a função  `products_delete_validate`;
 - Trigger de `before insert` na tabela `categories`: definido usando a função  `categories_insert_validate`;
 - Trigger de `before update` na tabela `categories`: definido usando a função  `categories_update_validate`;
-- Trigger de `before insert` na tabela `spents`: definido usando a função  `spents_insert_validate`;
-- Trigger de `before update` na tabela `spents`: definido usando a função  `spents_update_validate`.
+- Trigger de `before delete` na tabela `categories`: definido usando a função  `categories_delete_validate`;
+- Trigger de `before insert` na tabela `expenses`: definido usando a função  `expenses_insert_validate`;
+- Trigger de `before update` na tabela `expenses`: definido usando a função  `expenses_update_validate`.
 
 #### Restrições dos campos
 As restrições dos campos estão sendo validadas nas funções e serão lançadas exceções no caso de inconformidades.
@@ -147,9 +149,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 ```
-- A tabela `spents` possui os campos `value` e `idproduct` com restrições.
+- A tabela `expenses` possui os campos `value` e `idproduct` com restrições.
 ```
-CREATE FUNCTION spents_insert_validate() RETURNS trigger AS $$
+CREATE FUNCTION expenses_insert_validate() RETURNS trigger AS $$
 BEGIN
     -- Verifica se foi fornecido o valor
     IF new.value is null THEN

@@ -8,6 +8,7 @@ async function init() {
         DROP TRIGGER IF EXISTS users_update_trigger ON users;
         DROP TRIGGER IF EXISTS products_insert_trigger ON products;
         DROP TRIGGER IF EXISTS products_update_trigger ON products;
+        DROP TRIGGER IF EXISTS products_delete_trigger ON products;
         DROP TRIGGER IF EXISTS categories_insert_trigger ON categories;
         DROP TRIGGER IF EXISTS categories_update_trigger ON categories;
         DROP TRIGGER IF EXISTS categories_delete_trigger ON categories;
@@ -15,7 +16,7 @@ async function init() {
         DROP TRIGGER IF EXISTS expenses_update_trigger ON expenses;
 
         DROP FUNCTION IF EXISTS users_insert_validade, users_update_validade, 
-                                products_insert_validate, products_update_validate,
+                                products_insert_validate, products_update_validate, products_delete_validate,
                                 categories_insert_validate, categories_update_validate, categories_delete_validate,
                                 expenses_insert_validate, expenses_update_validate;
         
@@ -232,13 +233,25 @@ async function init() {
         $$ LANGUAGE plpgsql;
 
 
-        -- Função para verificar name repetido na tabela categories ao inserir
+        -- Função para verificar se a categoria existe na tabela products
         CREATE FUNCTION categories_delete_validate() 
         RETURNS trigger AS $$
         BEGIN
             -- Verifica se existem produtos associados à categoria que está sendo excluída
             IF EXISTS (SELECT 1 FROM products WHERE idcategory = OLD.id) THEN
                 RAISE EXCEPTION 'A categoria não pode ser excluída por existirem produtos';
+            END IF;
+            RETURN OLD;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        -- Função para verificar se o produto existe na tabela expenses
+        CREATE FUNCTION products_delete_validate() 
+        RETURNS trigger AS $$
+        BEGIN
+            -- Verifica se existem gastos associados ao produto que está sendo excluído
+            IF EXISTS (SELECT 1 FROM expenses WHERE idproduct = OLD.id) THEN
+                RAISE EXCEPTION 'O produto não pode ser excluído por existirem gastos';
             END IF;
             RETURN OLD;
         END;
@@ -316,6 +329,11 @@ async function init() {
         CREATE TRIGGER categories_delete_trigger
         BEFORE DELETE ON categories
         FOR EACH ROW EXECUTE PROCEDURE categories_delete_validate();
+
+        -- Associa a função products_delete_validate ao trigger de delete na tabela products
+        CREATE TRIGGER products_delete_trigger
+        BEFORE DELETE ON products
+        FOR EACH ROW EXECUTE PROCEDURE products_delete_validate();
 
         CREATE TRIGGER expenses_insert_trigger
         BEFORE INSERT ON expenses
