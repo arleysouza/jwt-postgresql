@@ -11,15 +11,15 @@ async function init() {
         DROP TRIGGER IF EXISTS categories_insert_trigger ON categories;
         DROP TRIGGER IF EXISTS categories_update_trigger ON categories;
         DROP TRIGGER IF EXISTS categories_delete_trigger ON categories;
-        DROP TRIGGER IF EXISTS spents_insert_trigger ON spents;
-        DROP TRIGGER IF EXISTS spents_update_trigger ON spents;
+        DROP TRIGGER IF EXISTS expenses_insert_trigger ON expenses;
+        DROP TRIGGER IF EXISTS expenses_update_trigger ON expenses;
 
         DROP FUNCTION IF EXISTS users_insert_validade, users_update_validade, 
                                 products_insert_validate, products_update_validate,
                                 categories_insert_validate, categories_update_validate, categories_delete_validate,
-                                spents_insert_validate, spents_update_validate;
+                                expenses_insert_validate, expenses_update_validate;
         
-        DROP TABLE IF EXISTS spents, products, users, categories;
+        DROP TABLE IF EXISTS expenses, products, users, categories;
         
         DROP TYPE IF EXISTS enum_profile CASCADE;
 
@@ -54,19 +54,19 @@ async function init() {
                 on UPDATE cascade
         );
 
-        CREATE TABLE IF NOT EXISTS spents (
+        CREATE TABLE IF NOT EXISTS expenses (
             id SERIAL,
             iduser integer not null,
             idproduct integer not null,
             value decimal(10,2) NOT NULL,
             datetime TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            CONSTRAINT spents_pk PRIMARY KEY (id),
-            CONSTRAINT spents_iduser_fk
+            CONSTRAINT expenses_pk PRIMARY KEY (id),
+            CONSTRAINT expenses_iduser_fk
                 FOREIGN KEY (iduser)
                 references users (id)
                 ON DELETE cascade
                 on UPDATE cascade,
-            CONSTRAINT spents_idproduct_fk
+            CONSTRAINT expenses_idproduct_fk
             FOREIGN KEY(idproduct)
                 references products (id)
                 ON DELETE restrict
@@ -244,7 +244,7 @@ async function init() {
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE FUNCTION spents_insert_validate() 
+        CREATE FUNCTION expenses_insert_validate() 
         RETURNS trigger AS $$
         BEGIN
             IF new.value is null THEN
@@ -263,7 +263,7 @@ async function init() {
         END;
         $$ LANGUAGE plpgsql;
 		
-        CREATE FUNCTION spents_update_validate() 
+        CREATE FUNCTION expenses_update_validate() 
         RETURNS trigger AS $$
         BEGIN
             IF new.value is null THEN
@@ -317,13 +317,13 @@ async function init() {
         BEFORE DELETE ON categories
         FOR EACH ROW EXECUTE PROCEDURE categories_delete_validate();
 
-        CREATE TRIGGER spents_insert_trigger
-        BEFORE INSERT ON spents
-        FOR EACH ROW EXECUTE PROCEDURE spents_insert_validate();
+        CREATE TRIGGER expenses_insert_trigger
+        BEFORE INSERT ON expenses
+        FOR EACH ROW EXECUTE PROCEDURE expenses_insert_validate();
 
-        CREATE TRIGGER spents_update_trigger
-        BEFORE UPDATE ON spents
-        FOR EACH ROW EXECUTE PROCEDURE spents_update_validate();
+        CREATE TRIGGER expenses_update_trigger
+        BEFORE UPDATE ON expenses
+        FOR EACH ROW EXECUTE PROCEDURE expenses_update_validate();
 
         COMMIT;
     `);

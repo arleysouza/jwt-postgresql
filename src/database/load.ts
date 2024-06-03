@@ -4,7 +4,7 @@ async function load() {
   return query(`
         BEGIN;
 
-        TRUNCATE spents CASCADE;
+        TRUNCATE expenses CASCADE;
         TRUNCATE products CASCADE;
         TRUNCATE categories CASCADE;
         TRUNCATE users CASCADE;
@@ -143,7 +143,7 @@ async function load() {
         (114,'Tesoura de poda',5),
         (115,'Pá',5);
 
-        INSERT INTO spents (iduser,idproduct,datetime,value)
+        INSERT INTO expenses (iduser,idproduct,datetime,value)
         VALUES
         (2,15,'2024-03-22 11:34:11',18.4),
         (2,15,'2024-04-05 18:04:19',17.9),
@@ -298,7 +298,7 @@ async function load() {
         SELECT setval('categories_id_seq', (SELECT MAX(id) FROM categories) + 1);
         SELECT setval('products_id_seq', (SELECT MAX(id) FROM products) + 1);
         SELECT setval('users_id_seq', (SELECT MAX(id) FROM users) + 1);
-        SELECT setval('spents_id_seq', (SELECT MAX(id) FROM spents) + 1);
+        SELECT setval('expenses_id_seq', (SELECT MAX(id) FROM expenses) + 1);
 
         COMMIT;
     `);

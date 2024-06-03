@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import query from "../database/connection";
 
-class SpentController {
+class ExpenseController {
   public async create(req: Request, res: Response): Promise<void> {
     const { idproduct, value } = req.body;
     const { id:iduser } = res.locals;
@@ -61,4 +61,4 @@ class SpentController {
   }
 }
 
-export default new SpentController();
+export default new ExpenseController();

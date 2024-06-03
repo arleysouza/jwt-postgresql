@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import user from "./user";
 import product from "./product";
 import userController from "../controllers/UserController";
-import spent from "./spent";
+import spent from "./expense";
 import category from "./category";
 import { validadeAcess } from "../middlewares";
 
