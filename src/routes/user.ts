@@ -12,6 +12,6 @@ routes.put("/senha", validadeAcess, controller.updatePassword);
 routes.put("/perfil", validadeAcess, checkAdm, controller.updateProfile);
 
 //aceita qualquer método HTTP ou URL
-routes.use( (_:Request,res:Response) => res.json({error:"Operação desconhecida com o usuário"}) );
+routes.use( (_:Request,res:Response) => res.json({message:"Operação desconhecida com o usuário"}) );
 
 export default routes;

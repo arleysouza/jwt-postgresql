@@ -6,7 +6,7 @@ class CategoryController {
     const { name } = req.body;
     if (name) {
       const r: any = await query(
-        "INSERT INTO categories(name) VALUES ($1) RETURNING id, name",
+        "INSERT INTO categories(name) VALUES ($1) RETURNING id::varchar, name",
         [name]
       );
       res.json(r);
@@ -24,7 +24,7 @@ class CategoryController {
     const { id } = req.params;
     if (id) {
       const r: any = await query(
-        "DELETE FROM categories WHERE id = $1 RETURNING id, name",
+        "DELETE FROM categories WHERE id = $1 RETURNING id::varchar, name",
         [id]
       );
       if (r.rowcount > 0) {
@@ -43,13 +43,13 @@ class CategoryController {
     const { id, name } = req.body;
     if (id && name) {
       const r: any = await query(
-        "UPDATE categories SET name=$2 WHERE id=$1 RETURNING id, name",
+        "UPDATE categories SET name=$2 WHERE id=$1 RETURNING id::varchar, name",
         [id, name]
       );
       if (r.rowcount > 0) {
         res.json(r.rows);
       } else if (r.rowcount == 0) {
-        res.json({ message: "Registro inexistente" });
+        res.json({ message: "Categoria inexistente" });
       } else {
         res.json(r);
       }

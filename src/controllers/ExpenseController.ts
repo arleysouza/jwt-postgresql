@@ -15,7 +15,7 @@ class ExpenseController {
   public async list(_: Request, res: Response): Promise<void> {
     const { id:iduser } = res.locals;
     const r:any = await query(
-      `SELECT a.id::varchar, b.id::varchar as idproduct, b.name, a.value::FLOAT, a.datetime
+      `SELECT a.id::varchar, b.id::varchar as product, b.name, a.value::FLOAT, a.datetime
        FROM expenses AS a LEFT JOIN products AS b
        ON a.idproduct = b.id
        WHERE iduser = $1

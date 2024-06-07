@@ -10,7 +10,7 @@ class ProductController {
       res.json({ message: "Forneça a categoria do produto" });
     } else {
       const r: any = await query(
-        "INSERT INTO products(name,idcategory) VALUES ($1,$2) RETURNING id, name, idcategory AS category",
+        "INSERT INTO products(name,idcategory) VALUES ($1,$2) RETURNING id::varchar, name, idcategory::varchar AS category",
         [name, category]
       );
       res.json(r);
@@ -28,7 +28,7 @@ class ProductController {
     const { id } = req.params;
     if (id) {
       const r: any = await query(
-        "DELETE FROM products WHERE id = $1 RETURNING id, name, idcategory as category",
+        "DELETE FROM products WHERE id = $1 RETURNING id::varchar, name, idcategory::varchar as category",
         [id]
       );
       if (r.rowcount > 0) {
@@ -51,7 +51,7 @@ class ProductController {
       res.json({ message: "Forneça a categoria do produto" });
     } else {
       const r: any = await query(
-        "UPDATE products SET name=$2, idcategory=$3 WHERE id=$1 RETURNING id, name, idcategory as category",
+        "UPDATE products SET name=$2, idcategory=$3 WHERE id=$1 RETURNING id::varchar, name, idcategory::varchar as category",
         [id, name, category]
       );
 

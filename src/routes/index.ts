@@ -15,6 +15,6 @@ routes.use("/produto", validadeAcess, product);
 routes.use("/gasto", validadeAcess, spent);
 
 //aceita qualquer método HTTP ou URL
-routes.use( (_:Request,res:Response) => res.json({error:"Requisição desconhecida"}) );
+routes.use( (_:Request,res:Response) => res.json({message:"Requisição desconhecida"}) );
 
 export default routes;

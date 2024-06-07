@@ -10,7 +10,7 @@ class UserController {
       res.status(401).json({ erro: "Forneça o e-mail e senha" });
     } else {
       const response: any = await query(
-        `SELECT id, mail, profile 
+        `SELECT id::varchar, mail, profile 
           FROM users 
           WHERE mail=$1 AND password=$2`,
         [mail, password]
@@ -29,7 +29,7 @@ class UserController {
     const { mail, password } = req.body;
 
     const response: any = await query(
-      "INSERT INTO users(mail,password) VALUES ($1,$2) RETURNING id, mail, profile",
+      "INSERT INTO users(mail,password) VALUES ($1,$2) RETURNING id::varchar, mail, profile",
       [mail, password]
     );
 
@@ -55,7 +55,7 @@ class UserController {
   public async delete(_: Request, res: Response): Promise<void> {
     const { id } = res.locals;
     const response: any = await query(
-      "DELETE FROM users WHERE id = $1 RETURNING id, mail, profile",
+      "DELETE FROM users WHERE id = $1 RETURNING id::varchar, mail, profile",
       [id]
     );
 
@@ -69,28 +69,40 @@ class UserController {
   public async updateMail(req: Request, res: Response): Promise<void> {
     const { mail } = req.body;
     const { id } = res.locals;
-    const r: any = await query("UPDATE users SET mail=$2 WHERE id=$1", [
-      id,
-      mail,
-    ]);
-    res.json(r);
+    const r: any = await query(
+      "UPDATE users SET mail=$2 WHERE id=$1 RETURNING id::varchar, mail, profile",
+      [id, mail]
+    );
+    if (r.rowcount > 0) {
+      res.json(r.rows);
+    } else if (r.rowcount == 0) {
+      res.json({ message: "Registro inexistente" });
+    } else {
+      res.json(r);
+    }
   }
 
   public async updatePassword(req: Request, res: Response): Promise<void> {
     const { password } = req.body;
     const { id } = res.locals;
-    const r: any = await query("UPDATE users SET password=$2 WHERE id=$1", [
-      id,
-      password,
-    ]);
-    res.json(r);
+    const r: any = await query(
+      "UPDATE users SET password=$2 WHERE id=$1 RETURNING id::varchar, mail, profile",
+      [id, password]
+    );
+    if (r.rowcount > 0) {
+      res.json(r.rows);
+    } else if (r.rowcount == 0) {
+      res.json({ message: "Registro inexistente" });
+    } else {
+      res.json(r);
+    }
   }
 
   public async updateProfile(req: Request, res: Response): Promise<void> {
     const { id, profile } = req.body;
     if (profile === "adm" || profile === "user") {
       const r: any = await query(
-        "UPDATE users SET profile=$2 WHERE id=$1 RETURNING id, mail, profile",
+        "UPDATE users SET profile=$2 WHERE id=$1 RETURNING id::varchar, mail, profile",
         [id, profile]
       );
       if (r.rowcount > 0) {
