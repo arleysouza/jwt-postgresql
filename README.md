@@ -90,30 +90,24 @@ $$ LANGUAGE plpgsql;
 ```
 - A tabela `products` possui os campos `name` e `idcategory` com restrições.
 ```
-CREATE FUNCTION products_insert_validate() RETURNS trigger AS $$
+CREATE FUNCTION products_update_validate() 
+RETURNS trigger AS $$
 BEGIN
-    -- Verifica se foi fornecido o nome
     IF new.name is null THEN
         RAISE EXCEPTION 'O nome é obrigatório';
     ELSE
         -- Converte para minúsculo e remove os espaços no início e fim
         new.name := lower(trim(new.name));
-        -- Verifica se o nome já existe
-        IF EXISTS (SELECT 1 FROM products WHERE new.name = name) THEN
+        
+        IF EXISTS (SELECT 1 FROM products WHERE new.name = name AND NEW.id <> id) THEN
             RAISE EXCEPTION 'O nome % já está em uso', new.name;
         ELSE
-            -- Verifica se o nome possui algum caractere
             IF length(new.name) = 0 THEN
                 RAISE EXCEPTION 'O nome precisa ter pelo menos uma letra';
             ELSE
-                -- Verifica se foi fornecido o idcategory
-                IF new.idcategory is NULL THEN
-                    RAISE EXCEPTION 'A categoria é obrigatória';
-                ELSE
-                    -- Verifica se o idcategory fornecido existe na tabela categories
-                    IF NOT EXISTS (SELECT 1 FROM categories WHERE id = NEW.idcategory) THEN
-                        RAISE EXCEPTION 'A categoria fornecida não existe no cadastro';
-                    END IF;
+                -- Verifica se o idcategory fornecido existe na tabela categories
+                IF NOT EXISTS (SELECT 1 FROM categories WHERE id = NEW.idcategory) THEN
+                    RAISE EXCEPTION 'A categoria fornecida não existe no cadastro';
                 END IF;
             END IF;
         END IF;
@@ -121,31 +115,39 @@ BEGIN
     RETURN new;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE FUNCTION products_delete_validate() 
+RETURNS trigger AS $$
+BEGIN
+    -- Verifica se existem gastos associados ao produto que está sendo excluído
+    IF EXISTS (SELECT 1 FROM expenses WHERE idproduct = OLD.id) THEN
+        RAISE EXCEPTION 'O produto não pode ser excluído por existirem gastos';
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
 ```
 - A tabela `users` possui os campos `mail` e `password` com restrições.
 ```
-CREATE FUNCTION users_insert_validade() RETURNS trigger AS $$
+CREATE FUNCTION users_insert_validade() 
+RETURNS trigger AS $$
 BEGIN
     -- Converte para minúsculo e remove os espaços no início e fim
     new.mail := lower(trim(new.mail));
     new.password := trim(new.password);
-    -- Verifica se foi fornecido o mail
+
     IF new.mail is null THEN
         RAISE EXCEPTION 'O e-mail é obrigatório';
     ELSE
-        -- Verifica se foi fornecida a senha
         IF new.password is null THEN
             RAISE EXCEPTION 'A senha é obrigatória';
         ELSE
-            -- Valida o formato do e-mail usando expressão regular
             IF NOT new.mail ~* '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$' THEN
                 RAISE EXCEPTION 'O e-mail % não está em um formato válido', new.mail;
             ELSE
-                -- Verifica se o mail já existe
                 IF EXISTS (SELECT 1 FROM users WHERE new.mail = mail) THEN
                     RAISE EXCEPTION 'O e-mail % já está em uso', new.mail;
                 ELSE
-                    -- Verifica se a senha tem a quantidade correta de caracteres
                     IF length(new.password) < 6 OR length(new.password) > 10 THEN
                         RAISE EXCEPTION 'A senha deve ter entre 6 e 10 caracterese';
                     END IF;
@@ -153,19 +155,19 @@ BEGIN
             END IF;
         END IF;
     END IF;
+    
     RETURN new;
 END;
 $$ LANGUAGE plpgsql;
 ```
 - A tabela `expenses` possui os campos `value` e `idproduct` com restrições.
 ```
-CREATE FUNCTION expenses_insert_validate() RETURNS trigger AS $$
+CREATE FUNCTION expenses_insert_validate() 
+RETURNS trigger AS $$
 BEGIN
-    -- Verifica se foi fornecido o valor
     IF new.value is null THEN
         RAISE EXCEPTION 'O valor é obrigatório';
     ELSE
-        -- Verifica se foi fornecido o ID do produto
         IF new.idproduct is null THEN
             RAISE EXCEPTION 'O produto é obrigatório';
         ELSE
@@ -181,8 +183,7 @@ $$ LANGUAGE plpgsql;
 ```
 
 ### Carregar dados de teste
-No arquivo `src/database/load.ts` estão as instruções SQL para carregar registros nas tabelas.
-
+No arquivo `src/database/load.ts` estão as instruções SQL para carregar dados de teste nas tabelas.
 Execute o comando `npm run load` para submeter as instruções SQL no SGBD.
 
 ### Restrições de acesso
