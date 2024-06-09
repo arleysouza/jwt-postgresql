@@ -4,7 +4,7 @@ O aplicativo possui as operações para fazer o CRUD nas tabelas representadas n
 
 ![](https://github.com/arleysouza/jwt-postgresql/blob/main/images/modelDB.png)
 
-O front end está disponível em (https://github.com/arleysouza/jwt-frontend). 
+O front end está disponível em https://github.com/arleysouza/jwt-frontend. 
 
 ### Instruções de uso
 Todos os pacotes necessários estão no `package.json`.
