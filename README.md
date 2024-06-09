@@ -7,7 +7,7 @@ O aplicativo possui as operações para fazer o CRUD nas tabelas representadas n
 O front end está disponível em https://github.com/arleysouza/jwt-frontend. 
 
 ### Instruções de uso
-Todos os pacotes necessários estão no `package.json`.
+Todos os pacotes necessários estão no `package.json`, então basta clonar o projeto e instalar as dependências.
 ```
 git clone https://github.com/arleysouza/jwt-postgresql.git server
 cd server
@@ -49,15 +49,10 @@ CREATE TRIGGER users_insert_trigger
 BEFORE INSERT ON users
 FOR EACH ROW EXECUTE PROCEDURE users_insert_validade();
 ```
-- Trigger de `before update` na tabela `users`: definido usando a função  `users_update_validade`;
-- Trigger de `before insert` na tabela `products`: definido usando a função  `products_insert_validate`;
-- Trigger de `before update` na tabela `products`: definido usando a função  `products_update_validate`;
-- Trigger de `before delete` na tabela `products`: definido usando a função  `products_delete_validate`;
-- Trigger de `before insert` na tabela `categories`: definido usando a função  `categories_insert_validate`;
-- Trigger de `before update` na tabela `categories`: definido usando a função  `categories_update_validate`;
-- Trigger de `before delete` na tabela `categories`: definido usando a função  `categories_delete_validate`;
-- Trigger de `before insert` na tabela `expenses`: definido usando a função  `expenses_insert_validate`;
-- Trigger de `before update` na tabela `expenses`: definido usando a função  `expenses_update_validate`.
+- Trigger de `before insert` e `before update` na tabela `users`, definidos usando as funções `users_insert_validade` e `users_update_validade`, respectivamente;
+- Trigger de `before insert` e `before update` na tabela `expenses`, definidos usando as funções `expenses_insert_validade` e `expenses_update_validade`, respectivamente;
+- Trigger de `before insert`, `before update` e `before delete` na tabela `products`, definido usando as funções `products_insert_validate`, `products_update_validate` e `products_delete_validate`, respectivamente;
+- Trigger de `before insert`, `before update` e `before delete` na tabela `categories`, definido usando as funções `categories_insert_validate`, `categories_update_validate` e `categories_delete_validate`, respectivamente.
 
 #### Restrições dos campos
 As restrições dos campos estão sendo validadas nas funções e serão lançadas exceções no caso de inconformidades.
