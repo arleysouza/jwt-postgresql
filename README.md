@@ -60,20 +60,31 @@ As restrições dos campos estão sendo validadas nas funções e serão lançad
 
 - A tabela `categories` possui apenas o campo `name` com restrições. Será lançada uma exceção caso não seja satisfeita a condição:
 ```
-CREATE FUNCTION categories_insert_validate() RETURNS trigger AS $$
+CREATE FUNCTION categories_insert_validate() 
+RETURNS trigger AS $$
 BEGIN
     -- Converte para minúsculo e remove os espaços no início e fim
     new.name := lower(trim(new.name));
-    -- Verifica se o nome já existe
+
     IF EXISTS (SELECT 1 FROM categories WHERE new.name = name) THEN
         RAISE EXCEPTION 'O nome % já está em uso', new.name;
     ELSE
-        -- Verifica se o nome possui algum caractere
         IF length(new.name) = 0 THEN
             RAISE EXCEPTION 'O nome precisa ter pelo menos uma letra';
         END IF;
     END IF;
     RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION categories_delete_validate() 
+RETURNS trigger AS $$
+BEGIN
+    -- Verifica se existem produtos associados à categoria que está sendo excluída
+    IF EXISTS (SELECT 1 FROM products WHERE idcategory = OLD.id) THEN
+        RAISE EXCEPTION 'A categoria não pode ser excluída por existirem produtos';
+    END IF;
+    RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
 ```
