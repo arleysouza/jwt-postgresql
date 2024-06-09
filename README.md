@@ -43,16 +43,17 @@ Execute o comando `npm run create` para submeter as instruções SQL no SGBD.
 #### Triggers
 
 Para fazer as validações nos campos das tabelas foram definidos os seguintes triggers, onde cada trigger foi definido usando uma função:
-- Trigger de `before insert` na tabela `users`: o comando a seguir faz a vinculação da função `users_insert_validade` ao trigger na tabela `users`:
+- Trigger de `before insert` e `before update` na tabela `users`, definidos usando as funções `users_insert_validade` e `users_update_validade`, respectivamente;
+- Trigger de `before insert` e `before update` na tabela `expenses`, definidos usando as funções `expenses_insert_validade` e `expenses_update_validade`, respectivamente;
+- Trigger de `before insert`, `before update` e `before delete` na tabela `products`, definido usando as funções `products_insert_validate`, `products_update_validate` e `products_delete_validate`, respectivamente;
+- Trigger de `before insert`, `before update` e `before delete` na tabela `categories`, definido usando as funções `categories_insert_validate`, `categories_update_validate` e `categories_delete_validate`, respectivamente.
+
+Como exemplo, o comando a seguir faz a vinculação da função `users_insert_validade` ao trigger na tabela `users`:
 ```
 CREATE TRIGGER users_insert_trigger
 BEFORE INSERT ON users
 FOR EACH ROW EXECUTE PROCEDURE users_insert_validade();
 ```
-- Trigger de `before insert` e `before update` na tabela `users`, definidos usando as funções `users_insert_validade` e `users_update_validade`, respectivamente;
-- Trigger de `before insert` e `before update` na tabela `expenses`, definidos usando as funções `expenses_insert_validade` e `expenses_update_validade`, respectivamente;
-- Trigger de `before insert`, `before update` e `before delete` na tabela `products`, definido usando as funções `products_insert_validate`, `products_update_validate` e `products_delete_validate`, respectivamente;
-- Trigger de `before insert`, `before update` e `before delete` na tabela `categories`, definido usando as funções `categories_insert_validate`, `categories_update_validate` e `categories_delete_validate`, respectivamente.
 
 #### Restrições dos campos
 As restrições dos campos estão sendo validadas nas funções e serão lançadas exceções no caso de inconformidades.
