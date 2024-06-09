@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import controller from "../controllers/CategoryController";
+import {CategoryController as controller} from "../controllers";
 import { checkAdm } from "../middlewares";
 
 const routes = Router();

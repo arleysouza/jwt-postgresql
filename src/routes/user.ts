@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import controller from "../controllers/UserController";
+import {UserController as controller} from "../controllers";
 import { checkAdm, validadeAcess } from "../middlewares";
 
 const routes = Router();

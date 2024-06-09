@@ -34,7 +34,7 @@ class ProductController {
       if (r.rowcount > 0) {
         res.json(r.rows);
       } else {
-        res.json({ message: "Registro inexistente" });
+        res.json(r);
       }
     } else {
       res.json({ message: "Forneça o produto" });

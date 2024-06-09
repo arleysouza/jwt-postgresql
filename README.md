@@ -4,6 +4,7 @@ O aplicativo possui as operações para fazer o CRUD nas tabelas representadas n
 
 ![](https://github.com/arleysouza/jwt-postgresql/blob/main/images/modelDB.png)
 
+O front end está disponível em (https://github.com/arleysouza/jwt-frontend). 
 
 ### Instruções de uso
 Todos os pacotes necessários estão no `package.json`.
@@ -22,7 +23,7 @@ DB_HOST = localhost
 DB_NAME = bdatividade
 DB_PASSWORD = 123
 DB_PORT = 5432
-DB_URI = postgres://root:@dpg-coufst21hbls7385tsd0-a.oregon-postgres.render.com/bdatividade
+DB_URI = postgres://root:@dpg-coufst21h85tsd0-a.oregon-postgres.render.com/bdatividade
 ```
 Se optar pelo SGBD na nuvem, você precisará sustituir a variável `DB_URI` e também retirar o comentário do código a seguir no arquivo `src/database/connection.ts`, para configurar o pool de conexões.
 ```
