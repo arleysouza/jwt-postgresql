@@ -6,7 +6,7 @@ class ExpenseController {
     const { idproduct, value } = req.body;
     const { id:iduser } = res.locals;
     const r:any = await query(
-      "INSERT INTO expenses(iduser,idproduct,value) VALUES ($1,$2,$3) RETURNING id,idproduct as product,datetime,value",
+      "INSERT INTO expenses(iduser,idproduct,value) VALUES ($1,$2,$3) RETURNING id::varchar,idproduct::varchar as product,datetime,value::FLOAT",
       [iduser, idproduct, value]
     );
     res.json(r);
@@ -30,7 +30,7 @@ class ExpenseController {
     const { id:iduser } = res.locals;
 
     const r:any = await query(
-      "DELETE FROM expenses WHERE id = $1 AND iduser=$2 RETURNING id,idproduct as product,value,datetime", 
+      "DELETE FROM expenses WHERE id = $1 AND iduser=$2 RETURNING id::varchar,idproduct::varchar as product,value::float,datetime", 
       [id, iduser]
     );
     if( r.rowcount > 0 ){
@@ -45,7 +45,7 @@ class ExpenseController {
     const { id, product, value } = req.body;
     const { id:iduser } = res.locals;
     const r:any = await query(
-      "UPDATE expenses SET idproduct=$3, value=$4 WHERE id=$1 AND iduser=$2 RETURNING id,idproduct as product,value,datetime", 
+      "UPDATE expenses SET idproduct=$3, value=$4 WHERE id=$1 AND iduser=$2 RETURNING id::varchar,idproduct::varchar as product,value::float,datetime", 
       [id,iduser,product,value]
     );
 
